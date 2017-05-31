@@ -67,7 +67,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   Copyright (c) 2014 Ryan Lanciaux | DynamicTyped
 
 	   See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
-	*/
+	   ** modified by coatsbj to support double-click AND to support a fix for grid resizing issues when in virtual scrolling mode **
+	 */
 	'use strict';
 
 	var _extends = Object.assign || function (target) {
@@ -193,6 +194,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            "isSubGriddle": false,
 	            "enableSort": true,
 	            "onRowClick": null,
+	            "onRowDoubleClick": null,
+	            "applyGridResizeFix": false,
 	            /* css class names */
 	            "sortAscendingClassName": "sort-ascending",
 	            "sortDescendingClassName": "sort-descending",
@@ -914,7 +917,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            externalLoadingComponent: this.props.externalLoadingComponent,
 	            externalIsLoading: this.props.externalIsLoading,
 	            hasMorePages: hasMorePages,
-	            onRowClick: this.props.onRowClick }));
+	            onRowClick: this.props.onRowClick,
+	            onRowDoubleClick: this.props.onRowDoubleClick,
+	            applyGridResizeFix: this.props.applyGridResizeFix }));
 	    },
 	    getContentSection: function getContentSection(data, cols, meta, pagingContent, hasMorePages, globalData) {
 	        if (this.shouldUseCustomGridComponent() && this.props.customGridComponent !== null) {
@@ -1009,7 +1014,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/*
 	   See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
-	*/
+	 ** modified by coatsbj to support double-click AND to support a fix for grid resizing issues when in virtual scrolling mode **
+	 */
 	'use strict';
 
 	var React = __webpack_require__(2);
@@ -1048,7 +1054,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      "parentRowExpandedComponent": "▼",
 	      "externalLoadingComponent": null,
 	      "externalIsLoading": false,
-	      "onRowClick": null
+	      "onRowClick": null,
+	      "onRowDoubleClick": null,
+	      "applyGridResizeFix": false
 	    };
 	  },
 	  getInitialState: function getInitialState() {
@@ -1065,6 +1073,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	    // After the subsequent renders, see if we need to load additional pages.
 	    this.gridScroll();
+	  },
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	    // [BJC, 5/31/2017] NOTE: The following is to ensure grid re-renders upon large-magnitude resize operation when grid was previously quite small in size
+	    // [BJC, 5/31/2017] NOTE: Because changing state will force a re-render, we ONLY want to do it if it's ABSOLUTELY necessary
+	    if (this.props.applyGridResizeFix && this.props.enableInfiniteScroll && nextProps.enableInfiniteScroll && this.refs.scrollable && nextProps.bodyHeight !== this.props.bodyHeight && this.refs.scrollable.scrollHeight > this.refs.scrollable.clientHeight && nextProps.bodyHeight - this.state.clientHeight > nextProps.rowHeight) {
+	      this.setState({
+	        clientHeight: nextProps.bodyHeight,
+	        scrollHeight: nextProps.bodyHeight > this.state.scrollHeight ? nextProps.bodyHeight : this.state.scrollHeight
+	      });
+	    }
 	  },
 	  gridScroll: function gridScroll() {
 	    if (this.props.enableInfiniteScroll && !this.props.externalIsLoading) {
@@ -1086,7 +1104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.setState(newState);
 	      }
 
-	      // Determine the diff by subtracting the amount scrolled by the total height, taking into consideratoin
+	      // Determine the diff by subtracting the amount scrolled by the total height, taking into consideration
 	      // the spacer's height.
 	      var scrollHeightDiff = scrollHeight - (scrollTop + clientHeight) - this.props.infiniteScrollLoadTreshold;
 
@@ -1168,7 +1186,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          rowHeight: that.props.rowHeight,
 	          hasChildren: hasChildren,
 	          tableClassName: that.props.className,
-	          onRowClick: that.props.onRowClick
+	          onRowClick: that.props.onRowClick,
+	          onRowDoubleClick: that.props.onRowDoubleClick
 	        });
 	      });
 
@@ -6918,7 +6937,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/*
 	   See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
-	*/
+	   ** modified by coatsbj to support double-click **
+	 */
 	'use strict';
 
 	var React = __webpack_require__(2);
@@ -6942,6 +6962,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      "parentRowCollapsedComponent": "▶",
 	      "parentRowExpandedComponent": "▼",
 	      "onRowClick": null,
+	      "onRowDoubleClick": null,
 	      "multipleSelectionSettings": null
 	    };
 	  },
@@ -6996,6 +7017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      paddingHeight: that.props.paddingHeight,
 	      rowHeight: that.props.rowHeight,
 	      onRowClick: that.props.onRowClick,
+	      onRowDoubleClick: that.props.onRowDoubleClick,
 	      multipleSelectionSettings: this.props.multipleSelectionSettings }));
 
 	    var children = null;
@@ -7759,7 +7781,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/*
 	   See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
-	*/
+	   ** modified by coatsbj to support double-click **
+	 */
 	'use strict';
 
 	var React = __webpack_require__(2);
@@ -7793,6 +7816,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            "parentRowCollapsedComponent": "▶",
 	            "parentRowExpandedComponent": "▼",
 	            "onRowClick": null,
+	            "onRowDoubleClick": null,
 	            "multipleSelectionSettings": null
 	        };
 	    },
@@ -7801,6 +7825,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.props.onRowClick(this, e);
 	        } else if (this.props.hasChildren) {
 	            this.props.toggleChildren();
+	        }
+	    },
+	    handleDoubleClick: function handleDoubleClick(e) {
+	        if (this.props.onRowDoubleClick !== null && isFunction(this.props.onRowDoubleClick)) {
+	            this.props.onRowDoubleClick(this, e);
 	        }
 	    },
 	    handleSelectionChange: function handleSelectionChange(e) {
@@ -7870,13 +7899,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (_this.props.columnSettings.hasColumnMetadata() && typeof meta !== 'undefined' && meta !== null) {
 	                if (typeof meta.customComponent !== 'undefined' && meta.customComponent !== null) {
 	                    var customComponent = React.createElement(meta.customComponent, { data: col[1], rowData: dataView, metadata: meta });
-	                    returnValue = React.createElement('td', { onClick: _this.handleClick, className: meta.cssClassName, key: index, style: columnStyles }, customComponent);
+	                    returnValue = React.createElement('td', { onClick: _this.handleClick, onDoubleClick: _this.handleDoubleClick, className: meta.cssClassName, key: index, style: columnStyles }, customComponent);
 	                } else {
-	                    returnValue = React.createElement('td', { onClick: _this.handleClick, className: meta.cssClassName, key: index, style: columnStyles }, firstColAppend, _this.formatData(col[1]));
+	                    returnValue = React.createElement('td', { onClick: _this.handleClick, onDoubleClick: _this.handleDoubleClick, className: meta.cssClassName, key: index, style: columnStyles }, firstColAppend, _this.formatData(col[1]));
 	                }
 	            }
 
-	            return returnValue || React.createElement('td', { onClick: _this.handleClick, key: index, style: columnStyles }, firstColAppend, col[1]);
+	            return returnValue || React.createElement('td', { onClick: _this.handleClick, onDoubleClick: _this.handleDoubleClick, key: index, style: columnStyles }, firstColAppend, col[1]);
 	        });
 
 	        // Don't compete with onRowClick, but if no onRowClick function then

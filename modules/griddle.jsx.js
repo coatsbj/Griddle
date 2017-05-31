@@ -4,7 +4,8 @@
    Copyright (c) 2014 Ryan Lanciaux | DynamicTyped
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
-*/
+   ** modified by coatsbj to support double-click AND to support a fix for grid resizing issues when in virtual scrolling mode **
+ */
 'use strict';
 
 var _extends = Object.assign || function (target) {
@@ -130,6 +131,8 @@ var Griddle = React.createClass({
             "isSubGriddle": false,
             "enableSort": true,
             "onRowClick": null,
+            "onRowDoubleClick": null,
+            "applyGridResizeFix": false,
             /* css class names */
             "sortAscendingClassName": "sort-ascending",
             "sortDescendingClassName": "sort-descending",
@@ -851,7 +854,9 @@ var Griddle = React.createClass({
             externalLoadingComponent: this.props.externalLoadingComponent,
             externalIsLoading: this.props.externalIsLoading,
             hasMorePages: hasMorePages,
-            onRowClick: this.props.onRowClick }));
+            onRowClick: this.props.onRowClick,
+            onRowDoubleClick: this.props.onRowDoubleClick,
+            applyGridResizeFix: this.props.applyGridResizeFix }));
     },
     getContentSection: function getContentSection(data, cols, meta, pagingContent, hasMorePages, globalData) {
         if (this.shouldUseCustomGridComponent() && this.props.customGridComponent !== null) {
